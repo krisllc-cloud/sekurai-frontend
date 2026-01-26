@@ -78,6 +78,20 @@ export interface Mission {
     config: Record<string, unknown>;
     created_at: string;
     updated_at: string;
+    data?: {
+        endpoints?: Array<{
+            url: string;
+            method: string;
+            params?: string[];
+            forms?: any[];
+            business_purpose?: string;      // NEW
+            sensitivity?: 'LOW' | 'HIGH';  // NEW
+        }>;
+        technologies?: string[];
+        business_context?: string;  // NEW
+        data_types?: string[];     // NEW
+        [key: string]: any;
+    };
 }
 
 export interface CreateMissionRequest {
