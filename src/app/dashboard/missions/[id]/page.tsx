@@ -178,11 +178,28 @@ export default function MissionDetailPage({ params }: { params: Promise<{ id: st
             {mission.data?.endpoints && mission.data.endpoints.length > 0 && (
                 <div className="glass rounded-xl p-6">
                     <div className="flex items-center justify-between mb-4">
-                        <h2 className="text-lg font-semibold">🎯 Discovered Endpoints</h2>
-                        <div className="flex items-center gap-2 text-xs">
-                            <span className="px-2 py-1 bg-green-500/20 text-green-400 rounded">✅ Validated</span>
-                            <span className="px-2 py-1 bg-yellow-500/20 text-yellow-400 rounded">🔒 Auth Required</span>
-                            <span className="px-2 py-1 bg-gray-500/20 text-gray-400 rounded">❓ Unknown</span>
+                        <h2 className="text-lg font-semibold flex items-center gap-2">
+                            <svg className="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                            </svg>
+                            Discovered Endpoints
+                        </h2>
+                        <div className="flex items-center gap-3 text-xs">
+                            <span className="flex items-center gap-1.5 px-2 py-1 bg-green-500/20 text-green-400 rounded">
+                                {/* 1A: Circle with checkmark */}
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                                    <circle cx="12" cy="12" r="10" />
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4" />
+                                </svg>
+                                Validated
+                            </span>
+                            <span className="flex items-center gap-1.5 px-2 py-1 bg-yellow-500/20 text-yellow-400 rounded">
+                                {/* 2B: Key icon */}
+                                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fillRule="evenodd" d="M18 8a6 6 0 01-7.743 5.743L10 14l-1 1-1 1H6v2H2v-4l4.257-4.257A6 6 0 1118 8zm-6-4a1 1 0 100 2 2 2 0 012 2 1 1 0 102 0 4 4 0 00-4-4z" clipRule="evenodd" />
+                                </svg>
+                                Auth Required
+                            </span>
                         </div>
                     </div>
 
@@ -234,10 +251,17 @@ export default function MissionDetailPage({ params }: { params: Promise<{ id: st
                                     <div key={i} className="bg-gray-900/50 rounded-lg p-4 hover:bg-gray-900/70 transition border border-gray-800 hover:border-gray-700">
                                         <div className="flex items-center justify-between">
                                             <div className="flex items-center gap-3 flex-1">
-                                                {/* Status icon - checkmark for all except auth-required */}
-                                                <span className="text-lg">
-                                                    {isAuthRequired ? '🔒' : '✅'}
-                                                </span>
+                                                {/* Status icon - 1A circle check for validated, 2B key for auth-required */}
+                                                {isAuthRequired ? (
+                                                    <svg className="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path fillRule="evenodd" d="M18 8a6 6 0 01-7.743 5.743L10 14l-1 1-1 1H6v2H2v-4l4.257-4.257A6 6 0 1118 8zm-6-4a1 1 0 100 2 2 2 0 012 2 1 1 0 102 0 4 4 0 00-4-4z" clipRule="evenodd" />
+                                                    </svg>
+                                                ) : (
+                                                    <svg className="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                                                        <circle cx="12" cy="12" r="10" />
+                                                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4" />
+                                                    </svg>
+                                                )}
 
                                                 {/* Method badge */}
                                                 <span className={`px-2 py-1 rounded text-xs font-medium min-w-[60px] text-center ${endpoint.method === 'GET' ? 'bg-green-500/20 text-green-400' :
@@ -257,10 +281,14 @@ export default function MissionDetailPage({ params }: { params: Promise<{ id: st
 
                                             {/* Status indicator - different for validated vs auth-required */}
                                             <div className="flex items-center gap-3">
-                                                {/* Source badge */}
-                                                {endpoint.source && (
-                                                    <span className="px-2 py-0.5 bg-purple-500/20 text-purple-300 rounded text-xs">
-                                                        {endpoint.source.replace('ai_', '🧠 ').replace('_', ' ')}
+                                                {/* Source badge - 3C circuit icon for AI-discovered */}
+                                                {endpoint.source && endpoint.source.includes('ai_') && (
+                                                    <span className="flex items-center gap-1.5 px-2 py-0.5 bg-purple-500/20 text-purple-300 rounded text-xs">
+                                                        <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+                                                            <path d="M13 7H7v6h6V7z" />
+                                                            <path fillRule="evenodd" d="M7 2a1 1 0 012 0v1h2V2a1 1 0 112 0v1h2a2 2 0 012 2v2h1a1 1 0 110 2h-1v2h1a1 1 0 110 2h-1v2a2 2 0 01-2 2h-2v1a1 1 0 11-2 0v-1H9v1a1 1 0 11-2 0v-1H5a2 2 0 01-2-2v-2H2a1 1 0 110-2h1V9H2a1 1 0 010-2h1V5a2 2 0 012-2h2V2zM5 5h10v10H5V5z" clipRule="evenodd" />
+                                                        </svg>
+                                                        {endpoint.source.replace('ai_', '').replace('_', ' ')}
                                                     </span>
                                                 )}
 
