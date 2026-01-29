@@ -160,6 +160,30 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Metrics Section */}
+      <section className="py-16 px-6 relative z-10">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            <div className="glass-strong rounded-2xl p-6 text-center">
+              <div className="text-4xl md:text-5xl font-bold text-gradient-blue mb-2">2.4M+</div>
+              <div className="text-gray-600 text-sm">Vulnerabilities Found</div>
+            </div>
+            <div className="glass-strong rounded-2xl p-6 text-center">
+              <div className="text-4xl md:text-5xl font-bold text-gradient-cyan mb-2">15+</div>
+              <div className="text-gray-600 text-sm">Specialized AI Agents</div>
+            </div>
+            <div className="glass-strong rounded-2xl p-6 text-center">
+              <div className="text-4xl md:text-5xl font-bold text-gray-900 mb-2">0.01%</div>
+              <div className="text-gray-600 text-sm">False Positive Rate</div>
+            </div>
+            <div className="glass-strong rounded-2xl p-6 text-center">
+              <div className="text-4xl md:text-5xl font-bold text-green-600 mb-2">10x</div>
+              <div className="text-gray-600 text-sm">Faster Than Manual</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* CTA Section */}
       <section className="py-24 px-6 relative z-10">
         <div className="max-w-4xl mx-auto">
