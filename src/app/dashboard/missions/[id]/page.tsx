@@ -62,7 +62,7 @@ export default function MissionDetailPage({ params }: { params: Promise<{ id: st
     const findings = mission.data?.secrets_found || [];
 
     return (
-        <div className="p-6 space-y-6">
+        <div className="space-y-6">
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div>
@@ -108,8 +108,8 @@ export default function MissionDetailPage({ params }: { params: Promise<{ id: st
                             <div key={phase.id} className="flex items-center flex-1">
                                 <div className="flex flex-col items-center">
                                     <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium transition-all ${isComplete ? 'bg-green-100 text-green-600 border-2 border-green-500' :
-                                            isCurrent ? 'bg-green-50 text-green-600 border-2 border-green-400 ring-4 ring-green-100' :
-                                                'bg-gray-100 text-gray-400 border-2 border-gray-200'
+                                        isCurrent ? 'bg-green-50 text-green-600 border-2 border-green-400 ring-4 ring-green-100' :
+                                            'bg-gray-100 text-gray-400 border-2 border-gray-200'
                                         }`}>
                                         {isComplete ? (
                                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -169,8 +169,8 @@ export default function MissionDetailPage({ params }: { params: Promise<{ id: st
                                         return (
                                             <div key={i} className="flex items-center gap-2 py-1.5 px-4 hover:bg-gray-50 rounded text-sm">
                                                 <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${endpoint.method === 'GET' ? 'bg-green-100 text-green-700' :
-                                                        endpoint.method === 'POST' ? 'bg-blue-100 text-blue-700' :
-                                                            'bg-gray-100 text-gray-700'
+                                                    endpoint.method === 'POST' ? 'bg-blue-100 text-blue-700' :
+                                                        'bg-gray-100 text-gray-700'
                                                     }`}>
                                                     {endpoint.method}
                                                 </span>
@@ -204,8 +204,8 @@ export default function MissionDetailPage({ params }: { params: Promise<{ id: st
                                 <div key={i} className="border border-gray-100 rounded-lg p-4 hover:border-gray-200 transition">
                                     <div className="flex items-center gap-2 mb-2">
                                         <span className={`px-2 py-0.5 rounded text-xs font-semibold ${finding.severity === 'critical' ? 'bg-red-100 text-red-700' :
-                                                finding.severity === 'high' ? 'bg-orange-100 text-orange-700' :
-                                                    'bg-yellow-100 text-yellow-700'
+                                            finding.severity === 'high' ? 'bg-orange-100 text-orange-700' :
+                                                'bg-yellow-100 text-yellow-700'
                                             }`}>
                                             {finding.severity?.toUpperCase() || 'MEDIUM'}
                                         </span>
@@ -247,9 +247,9 @@ export default function MissionDetailPage({ params }: { params: Promise<{ id: st
                                     </span>
                                     <div>
                                         <span className={`font-medium ${msg.type === 'error' ? 'text-red-600' :
-                                                msg.type === 'finding' ? 'text-orange-600' :
-                                                    msg.type === 'discovery' ? 'text-blue-600' :
-                                                        'text-purple-600'
+                                            msg.type === 'finding' ? 'text-orange-600' :
+                                                msg.type === 'discovery' ? 'text-blue-600' :
+                                                    'text-purple-600'
                                             }`}>
                                             {msg.type}
                                         </span>
