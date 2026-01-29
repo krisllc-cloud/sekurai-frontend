@@ -1,6 +1,6 @@
 "use client";
 
-import { useMission, useMissionUpdates, useMissionFindings } from "@/lib/hooks";
+import { useMission, useMissionUpdates, useMissionFindings, useMissionEndpoints } from "@/lib/hooks";
 import Link from "next/link";
 import { use } from "react";
 
@@ -33,6 +33,7 @@ export default function MissionDetailPage({ params }: { params: Promise<{ id: st
     const { mission, loading, error } = useMission(id);
     const { connected, messages } = useMissionUpdates(id);
     const { findings: apiFindings } = useMissionFindings(id);
+    const { endpoints: apiEndpoints } = useMissionEndpoints(id);
 
     if (loading) {
         return (
@@ -59,8 +60,8 @@ export default function MissionDetailPage({ params }: { params: Promise<{ id: st
     }
 
     const currentPhase = getPhaseIndex(mission.status);
-    const endpoints = mission.data?.endpoints || [];
-    // Use API findings first, fallback to mission data secrets
+    // Use API data first, fallback to mission data
+    const endpoints = apiEndpoints.length > 0 ? apiEndpoints : (mission.data?.endpoints || []);
     const findings = apiFindings.length > 0 ? apiFindings : (mission.data?.secrets_found || []);
 
     return (
@@ -214,17 +215,17 @@ export default function MissionDetailPage({ params }: { params: Promise<{ id: st
                                         {/* Header with severity and type */}
                                         <div className="flex items-center gap-2 mb-3">
                                             <span className={`px-2 py-0.5 rounded text-xs font-bold uppercase ${severity === 'critical' ? 'bg-red-100 text-red-700 border border-red-200' :
-                                                    severity === 'high' ? 'bg-orange-100 text-orange-700 border border-orange-200' :
-                                                        severity === 'medium' ? 'bg-yellow-100 text-yellow-700 border border-yellow-200' :
-                                                            'bg-blue-100 text-blue-700 border border-blue-200'
+                                                severity === 'high' ? 'bg-orange-100 text-orange-700 border border-orange-200' :
+                                                    severity === 'medium' ? 'bg-yellow-100 text-yellow-700 border border-yellow-200' :
+                                                        'bg-blue-100 text-blue-700 border border-blue-200'
                                                 }`}>
                                                 {severity}
                                             </span>
                                             <span className="text-sm font-semibold text-gray-900">{vulnType}</span>
                                             <span className={`ml-auto text-xs px-2 py-0.5 rounded-full font-medium ${confidence === 'PROVEN' ? 'bg-green-100 text-green-700' :
-                                                    confidence === 'CONFIRMED' ? 'bg-green-100 text-green-700' :
-                                                        confidence === 'LIKELY' ? 'bg-yellow-100 text-yellow-700' :
-                                                            'bg-gray-100 text-gray-600'
+                                                confidence === 'CONFIRMED' ? 'bg-green-100 text-green-700' :
+                                                    confidence === 'LIKELY' ? 'bg-yellow-100 text-yellow-700' :
+                                                        'bg-gray-100 text-gray-600'
                                                 }`}>
                                                 {confidence}
                                             </span>
