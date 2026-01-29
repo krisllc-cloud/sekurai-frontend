@@ -1,6 +1,6 @@
 "use client";
 
-import { useMission, useMissionUpdates } from "@/lib/hooks";
+import { useMission, useMissionUpdates, useMissionFindings } from "@/lib/hooks";
 import Link from "next/link";
 import { use } from "react";
 
@@ -32,6 +32,7 @@ export default function MissionDetailPage({ params }: { params: Promise<{ id: st
     const { id } = use(params);
     const { mission, loading, error } = useMission(id);
     const { connected, messages } = useMissionUpdates(id);
+    const { findings: apiFindings } = useMissionFindings(id);
 
     if (loading) {
         return (
@@ -59,7 +60,8 @@ export default function MissionDetailPage({ params }: { params: Promise<{ id: st
 
     const currentPhase = getPhaseIndex(mission.status);
     const endpoints = mission.data?.endpoints || [];
-    const findings = mission.data?.secrets_found || [];
+    // Use API findings first, fallback to mission data secrets
+    const findings = apiFindings.length > 0 ? apiFindings : (mission.data?.secrets_found || []);
 
     return (
         <div className="space-y-6">
@@ -196,28 +198,68 @@ export default function MissionDetailPage({ params }: { params: Promise<{ id: st
                         </div>
                         <span className="text-xs px-2 py-1 rounded-full bg-green-100 text-green-700">{findings.length} confirmed</span>
                     </div>
-                    <div className="p-4 space-y-4 max-h-[450px] overflow-auto">
+                    <div className="p-4 space-y-4 max-h-[500px] overflow-auto">
                         {findings.length === 0 ? (
                             <p className="text-gray-400 text-sm text-center py-8">No vulnerabilities found yet</p>
                         ) : (
-                            findings.map((finding: any, i: number) => (
-                                <div key={i} className="border border-gray-100 rounded-lg p-4 hover:border-gray-200 transition">
-                                    <div className="flex items-center gap-2 mb-2">
-                                        <span className={`px-2 py-0.5 rounded text-xs font-semibold ${finding.severity === 'critical' ? 'bg-red-100 text-red-700' :
-                                            finding.severity === 'high' ? 'bg-orange-100 text-orange-700' :
-                                                'bg-yellow-100 text-yellow-700'
-                                            }`}>
-                                            {finding.severity?.toUpperCase() || 'MEDIUM'}
-                                        </span>
-                                        <span className="text-sm font-medium text-gray-900">{finding.type}</span>
-                                        <span className="ml-auto text-xs px-2 py-0.5 rounded bg-green-100 text-green-700">CONFIRMED</span>
+                            findings.map((finding: any, i: number) => {
+                                const severity = (finding.severity || 'medium').toLowerCase();
+                                const vulnType = finding.vuln_type || finding.type || 'Unknown';
+                                const confidence = finding.confidence || 'CONFIRMED';
+                                const endpoint = finding.endpoint || finding.location || 'N/A';
+                                const payload = finding.payload || finding.value || '';
+
+                                return (
+                                    <div key={finding.id || i} className="border border-gray-100 rounded-lg p-4 hover:border-gray-200 transition hover:shadow-sm">
+                                        {/* Header with severity and type */}
+                                        <div className="flex items-center gap-2 mb-3">
+                                            <span className={`px-2 py-0.5 rounded text-xs font-bold uppercase ${severity === 'critical' ? 'bg-red-100 text-red-700 border border-red-200' :
+                                                    severity === 'high' ? 'bg-orange-100 text-orange-700 border border-orange-200' :
+                                                        severity === 'medium' ? 'bg-yellow-100 text-yellow-700 border border-yellow-200' :
+                                                            'bg-blue-100 text-blue-700 border border-blue-200'
+                                                }`}>
+                                                {severity}
+                                            </span>
+                                            <span className="text-sm font-semibold text-gray-900">{vulnType}</span>
+                                            <span className={`ml-auto text-xs px-2 py-0.5 rounded-full font-medium ${confidence === 'PROVEN' ? 'bg-green-100 text-green-700' :
+                                                    confidence === 'CONFIRMED' ? 'bg-green-100 text-green-700' :
+                                                        confidence === 'LIKELY' ? 'bg-yellow-100 text-yellow-700' :
+                                                            'bg-gray-100 text-gray-600'
+                                                }`}>
+                                                {confidence}
+                                            </span>
+                                        </div>
+
+                                        {/* Endpoint */}
+                                        <div className="mb-2">
+                                            <span className="text-xs text-gray-500">Endpoint: </span>
+                                            <span className="text-xs font-mono text-blue-600">{endpoint}</span>
+                                        </div>
+
+                                        {/* Payload */}
+                                        {payload && (
+                                            <div className="bg-gray-900 rounded-lg p-3 font-mono text-xs text-green-400 overflow-x-auto">
+                                                <div className="text-gray-500 text-[10px] mb-1">Payload:</div>
+                                                {payload.length > 100 ? payload.substring(0, 100) + '...' : payload}
+                                            </div>
+                                        )}
+
+                                        {/* Evidence preview */}
+                                        {finding.evidence && Object.keys(finding.evidence).length > 0 && (
+                                            <div className="mt-2 text-xs text-gray-500">
+                                                <span className="font-medium">Evidence:</span> {Object.keys(finding.evidence).join(', ')}
+                                            </div>
+                                        )}
+
+                                        {/* Timestamp */}
+                                        {finding.created_at && (
+                                            <div className="mt-2 text-[10px] text-gray-400">
+                                                Found: {new Date(finding.created_at).toLocaleString()}
+                                            </div>
+                                        )}
                                     </div>
-                                    <p className="text-xs text-gray-500 mb-2">POST {finding.location || 'N/A'}</p>
-                                    <div className="bg-gray-900 rounded p-2 font-mono text-xs text-green-400">
-                                        {finding.value?.substring(0, 50) || finding.payload || '...'}
-                                    </div>
-                                </div>
-                            ))
+                                );
+                            })
                         )}
                     </div>
                 </div>

@@ -120,6 +120,44 @@ export function useMissionStats(missionId: string) {
 }
 
 /**
+ * Hook to fetch mission findings from memory store
+ */
+export function useMissionFindings(missionId: string) {
+    const { getToken } = useAuth();
+    const [findings, setFindings] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+        async function fetchFindings() {
+            try {
+                setLoading(true);
+                const token = await getToken();
+                if (!token) {
+                    throw new Error("Not authenticated");
+                }
+
+                const data = await memoryAPI.getFindings(missionId, token);
+                setFindings(data.findings || []);
+                setError(null);
+            } catch (err) {
+                // Fallback silently - findings might not exist yet
+                setFindings([]);
+                setError(null);
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        if (missionId) {
+            fetchFindings();
+        }
+    }, [missionId, getToken]);
+
+    return { findings, loading, error, refetch: () => { } };
+}
+
+/**
  * Hook for WebSocket connection to mission updates
  */
 export function useMissionUpdates(missionId: string) {
