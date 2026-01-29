@@ -23,17 +23,48 @@ export default function FindingsPage() {
                 const token = await getToken();
                 if (!token) return;
 
-                const findingsPromises = missions.map(async (mission) => {
+                const findingsPromises = missions.map(async (mission: any) => {
+                    // Get findings from memory store API
+                    let memoryFindings: any[] = [];
                     try {
                         const data = await memoryAPI.getFindings(mission.id, token);
-                        return (data.findings || []).map((f: any) => ({
+                        memoryFindings = (data.findings || []).map((f: any) => ({
                             ...f,
                             mission_target: mission.target_url,
                             mission_id: mission.id,
                         }));
                     } catch {
-                        return [];
+                        // API might not have findings
                     }
+
+                    // Also include findings from PostgreSQL (mission.data)
+                    const dbFindings: any[] = [];
+
+                    // Confirmed vulns from attack phase
+                    if (mission.data?.confirmed_vulns) {
+                        mission.data.confirmed_vulns.forEach((v: any) => {
+                            dbFindings.push({
+                                ...v,
+                                mission_target: mission.target_url,
+                                mission_id: mission.id,
+                            });
+                        });
+                    }
+
+                    // Secrets found from discovery phase
+                    if (mission.data?.secrets_found) {
+                        mission.data.secrets_found.forEach((s: any) => {
+                            dbFindings.push({
+                                ...s,
+                                vuln_type: s.type || 'Secret Exposure',
+                                mission_target: mission.target_url,
+                                mission_id: mission.id,
+                            });
+                        });
+                    }
+
+                    // Prefer memory findings, fallback to DB
+                    return memoryFindings.length > 0 ? memoryFindings : dbFindings;
                 });
 
                 const results = await Promise.all(findingsPromises);
@@ -111,8 +142,8 @@ export default function FindingsPage() {
                                         <div className="flex items-center gap-2 mb-1">
                                             <span className="font-semibold text-gray-900">{finding.vuln_type || finding.type || 'Unknown'}</span>
                                             <span className={`text-xs px-2 py-0.5 rounded-full ${finding.confidence === 'PROVEN' || finding.confidence === 'CONFIRMED'
-                                                    ? 'bg-green-100 text-green-700'
-                                                    : 'bg-gray-100 text-gray-600'
+                                                ? 'bg-green-100 text-green-700'
+                                                : 'bg-gray-100 text-gray-600'
                                                 }`}>
                                                 {finding.confidence || 'CONFIRMED'}
                                             </span>

@@ -62,7 +62,15 @@ export default function MissionDetailPage({ params }: { params: Promise<{ id: st
     const currentPhase = getPhaseIndex(mission.status);
     // Use API data first, fallback to mission data
     const endpoints = apiEndpoints.length > 0 ? apiEndpoints : (mission.data?.endpoints || []);
-    const findings = apiFindings.length > 0 ? apiFindings : (mission.data?.secrets_found || []);
+
+    // Merge findings from all sources:
+    // - apiFindings: from memory store API
+    // - secrets_found: from discovery phase (PostgreSQL)
+    // - confirmed_vulns: from attack phase (PostgreSQL)
+    const secretsFound = mission.data?.secrets_found || [];
+    const confirmedVulns = mission.data?.confirmed_vulns || [];
+    const dbFindings = [...secretsFound, ...confirmedVulns];
+    const findings = apiFindings.length > 0 ? apiFindings : dbFindings;
 
     return (
         <div className="space-y-6">
