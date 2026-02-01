@@ -46,40 +46,65 @@ export function useMissions() {
 }
 
 /**
- * Hook to fetch a single mission
+ * Hook to fetch a single mission with auto-refresh for active missions
+ * Polls every 5 seconds when mission is in DISCOVERY or EXPLOITATION status
  */
 export function useMission(id: string) {
     const { getToken } = useAuth();
     const [mission, setMission] = useState<Mission | null>(null);
     const [loading, setLoading] = useState(true);
+    const [isRefreshing, setIsRefreshing] = useState(false);
+    const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
     const [error, setError] = useState<string | null>(null);
 
-    useEffect(() => {
-        async function fetchMission() {
-            try {
-                setLoading(true);
-                const token = await getToken();
-                if (!token) {
-                    throw new Error("Not authenticated");
-                }
+    const fetchMission = async (showLoading = false) => {
+        try {
+            if (showLoading) setLoading(true);
+            else setIsRefreshing(true);
 
-                const data = await missionsAPI.get(id, token);
-                setMission(data.mission);
-                setError(null);
-            } catch (err) {
-                setError(err instanceof Error ? err.message : "Failed to fetch mission");
-                setMission(null);
-            } finally {
-                setLoading(false);
+            const token = await getToken();
+            if (!token) {
+                throw new Error("Not authenticated");
             }
-        }
 
+            const data = await missionsAPI.get(id, token);
+            setMission(data.mission);
+            setLastUpdated(new Date());
+            setError(null);
+        } catch (err) {
+            setError(err instanceof Error ? err.message : "Failed to fetch mission");
+            setMission(null);
+        } finally {
+            if (showLoading) setLoading(false);
+            setIsRefreshing(false);
+        }
+    };
+
+    // Initial fetch
+    useEffect(() => {
         if (id) {
-            fetchMission();
+            fetchMission(true);
         }
     }, [id, getToken]);
 
-    return { mission, loading, error };
+    // Auto-refresh for active missions (every 5 seconds)
+    useEffect(() => {
+        if (!mission) return;
+
+        const isActive = ['DISCOVERY', 'EXPLOITATION', 'PENDING', 'RUNNING'].includes(mission.status);
+        if (!isActive) return;
+
+        const intervalId = setInterval(() => {
+            fetchMission(false); // Don't show loading spinner on refresh
+        }, 5000);
+
+        return () => clearInterval(intervalId);
+    }, [mission?.status, id, getToken]);
+
+    // Manual refresh function
+    const refresh = () => fetchMission(false);
+
+    return { mission, loading, error, refresh, isRefreshing, lastUpdated };
 }
 
 /**
@@ -117,81 +142,6 @@ export function useMissionStats(missionId: string) {
     }, [missionId, getToken]);
 
     return { stats, loading, error };
-}
-
-/**
- * Hook to fetch mission findings from memory store
- */
-export function useMissionFindings(missionId: string) {
-    const { getToken } = useAuth();
-    const [findings, setFindings] = useState<any[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-
-    useEffect(() => {
-        async function fetchFindings() {
-            try {
-                setLoading(true);
-                const token = await getToken();
-                if (!token) {
-                    throw new Error("Not authenticated");
-                }
-
-                const data = await memoryAPI.getFindings(missionId, token);
-                setFindings(data.findings || []);
-                setError(null);
-            } catch (err) {
-                // Fallback silently - findings might not exist yet
-                setFindings([]);
-                setError(null);
-            } finally {
-                setLoading(false);
-            }
-        }
-
-        if (missionId) {
-            fetchFindings();
-        }
-    }, [missionId, getToken]);
-
-    return { findings, loading, error, refetch: () => { } };
-}
-
-/**
- * Hook to fetch mission endpoints from memory store
- */
-export function useMissionEndpoints(missionId: string) {
-    const { getToken } = useAuth();
-    const [endpoints, setEndpoints] = useState<any[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-
-    useEffect(() => {
-        async function fetchEndpoints() {
-            try {
-                setLoading(true);
-                const token = await getToken();
-                if (!token) {
-                    throw new Error("Not authenticated");
-                }
-
-                const data = await memoryAPI.getEndpoints(missionId, token);
-                setEndpoints(data.endpoints || []);
-                setError(null);
-            } catch (err) {
-                setEndpoints([]);
-                setError(null);
-            } finally {
-                setLoading(false);
-            }
-        }
-
-        if (missionId) {
-            fetchEndpoints();
-        }
-    }, [missionId, getToken]);
-
-    return { endpoints, loading, error };
 }
 
 /**
