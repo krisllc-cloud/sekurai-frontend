@@ -87,107 +87,59 @@ export default function StatsGrid() {
     };
 
     return (
-        <section className="px-6 relative z-10">
-            <div className="max-w-7xl mx-auto">
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+        <section className="py-20 px-6 relative z-10">
+            <div className="max-w-5xl mx-auto">
+                <div className="flex flex-wrap justify-center gap-x-16 gap-y-12 md:gap-x-24">
                     {/* Missions Completed */}
-                    <div className="bg-white/5 rounded-2xl p-6 border border-white/5 backdrop-blur-sm hover:bg-white/10 transition-colors group">
-                        <div className="flex items-start justify-between mb-4">
-                            <div className="w-12 h-12 rounded-xl bg-purple-500/10 flex items-center justify-center group-hover:scale-110 transition-transform">
-                                <svg
-                                    className="w-6 h-6 text-purple-400"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth={2}
-                                        d="M13 10V3L4 14h7v7l9-11h-7z"
-                                    />
-                                </svg>
-                            </div>
+                    <div className="text-center group">
+                        <div className="w-14 h-14 mx-auto mb-4 rounded-full bg-gradient-to-br from-purple-500/20 to-purple-600/5 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                            <svg className="w-7 h-7 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                            </svg>
                         </div>
-                        <div className="text-3xl font-bold text-white mb-1">
+                        <div className="text-5xl font-bold bg-gradient-to-r from-purple-400 to-purple-300 bg-clip-text text-transparent mb-2">
                             {formatNumber(displayStats.total_missions)}
                         </div>
-                        <div className="text-sm text-gray-400">Missions Completed</div>
+                        <div className="text-sm text-gray-500 uppercase tracking-wider font-medium">Missions</div>
                     </div>
 
                     {/* Endpoints Scanned */}
-                    <div className="bg-white/5 rounded-2xl p-6 border border-white/5 backdrop-blur-sm hover:bg-white/10 transition-colors group">
-                        <div className="flex items-start justify-between mb-4">
-                            <div className="w-12 h-12 rounded-xl bg-cyan-500/10 flex items-center justify-center group-hover:scale-110 transition-transform">
-                                <svg
-                                    className="w-6 h-6 text-cyan-400"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth={2}
-                                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                                    />
-                                </svg>
-                            </div>
+                    <div className="text-center group">
+                        <div className="w-14 h-14 mx-auto mb-4 rounded-full bg-gradient-to-br from-cyan-500/20 to-cyan-600/5 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                            <svg className="w-7 h-7 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
                         </div>
-                        <div className="text-3xl font-bold text-white mb-1">
+                        <div className="text-5xl font-bold bg-gradient-to-r from-cyan-400 to-cyan-300 bg-clip-text text-transparent mb-2">
                             {formatNumber(displayStats.total_endpoints)}
                         </div>
-                        <div className="text-sm text-gray-400">Endpoints Scanned</div>
+                        <div className="text-sm text-gray-500 uppercase tracking-wider font-medium">Endpoints</div>
                     </div>
 
                     {/* Payloads Tested */}
-                    <div className="bg-white/5 rounded-2xl p-6 border border-white/5 backdrop-blur-sm hover:bg-white/10 transition-colors group">
-                        <div className="flex items-start justify-between mb-4">
-                            <div className="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center group-hover:scale-110 transition-transform">
-                                <svg
-                                    className="w-6 h-6 text-blue-400"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth={2}
-                                        d="M13 10V3L4 14h7v7l9-11h-7z"
-                                    />
-                                </svg>
-                            </div>
+                    <div className="text-center group">
+                        <div className="w-14 h-14 mx-auto mb-4 rounded-full bg-gradient-to-br from-blue-500/20 to-blue-600/5 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                            <svg className="w-7 h-7 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                            </svg>
                         </div>
-                        <div className="text-3xl font-bold text-white mb-1">
+                        <div className="text-5xl font-bold bg-gradient-to-r from-blue-400 to-blue-300 bg-clip-text text-transparent mb-2">
                             {formatNumber(displayStats.total_payloads)}
                         </div>
-                        <div className="text-sm text-gray-400">Payloads Tested</div>
+                        <div className="text-sm text-gray-500 uppercase tracking-wider font-medium">Payloads</div>
                     </div>
 
                     {/* Vulnerabilities Found */}
-                    <div className="bg-white/5 rounded-2xl p-6 border border-white/5 backdrop-blur-sm hover:bg-white/10 transition-colors group">
-                        <div className="flex items-start justify-between mb-4">
-                            <div className="w-12 h-12 rounded-xl bg-red-500/10 flex items-center justify-center group-hover:scale-110 transition-transform">
-                                <svg
-                                    className="w-6 h-6 text-red-400"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth={2}
-                                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-                                    />
-                                </svg>
-                            </div>
+                    <div className="text-center group">
+                        <div className="w-14 h-14 mx-auto mb-4 rounded-full bg-gradient-to-br from-red-500/20 to-red-600/5 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                            <svg className="w-7 h-7 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                            </svg>
                         </div>
-                        <div className="text-3xl font-bold text-white mb-1">
+                        <div className="text-5xl font-bold bg-gradient-to-r from-red-400 to-orange-300 bg-clip-text text-transparent mb-2">
                             {formatNumber(displayStats.total_vulnerabilities)}
                         </div>
-                        <div className="text-sm text-gray-400">Vulnerabilities Found</div>
+                        <div className="text-sm text-gray-500 uppercase tracking-wider font-medium">Vulnerabilities</div>
                     </div>
                 </div>
             </div>

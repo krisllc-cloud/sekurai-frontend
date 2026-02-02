@@ -72,21 +72,19 @@ export default function LandingPage() {
         </div>
       </div>
 
-      {/* Stats Grid - Wrapped for spacing consistency */}
-      <div className="border-y border-white/5 bg-white/[0.02]">
-        <StatsGrid />
-      </div>
+      {/* Stats Grid */}
+      <StatsGrid />
 
       {/* Value Props */}
       <ValuePropsSection />
 
       {/* How It Works */}
-      <div id="how-it-works" className="py-20 border-t border-white/5">
+      <div id="how-it-works">
         <HowItWorksSection />
       </div>
 
       {/* Features */}
-      <div id="features" className="py-20 bg-white/[0.02] border-y border-white/5">
+      <div id="features" className="py-20">
         <FeaturesSection />
       </div>
 

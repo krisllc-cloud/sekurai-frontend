@@ -123,17 +123,17 @@ export default function LandingHero() {
                 </div>
 
                 {/* Capabilities */}
-                <div className="flex flex-wrap justify-center gap-3 text-sm text-gray-600">
-                    <span className="px-4 py-2 bg-gray-100 rounded-full">
+                <div className="flex flex-wrap justify-center gap-3 text-sm">
+                    <span className="px-4 py-2 bg-white/5 border border-white/10 text-gray-400 rounded-full backdrop-blur-sm">
                         📊 Business Logic Abuse
                     </span>
-                    <span className="px-4 py-2 bg-gray-100 rounded-full">
+                    <span className="px-4 py-2 bg-white/5 border border-white/10 text-gray-400 rounded-full backdrop-blur-sm">
                         💉 SQL + XSS + SSRF
                     </span>
-                    <span className="px-4 py-2 bg-gray-100 rounded-full">
+                    <span className="px-4 py-2 bg-white/5 border border-white/10 text-gray-400 rounded-full backdrop-blur-sm">
                         ⏱️ Real-time Reports
                     </span>
-                    <span className="px-4 py-2 bg-gray-100 rounded-full">
+                    <span className="px-4 py-2 bg-white/5 border border-white/10 text-gray-400 rounded-full backdrop-blur-sm">
                         🔍 BOR Attacks
                     </span>
                 </div>
