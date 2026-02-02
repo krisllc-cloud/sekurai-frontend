@@ -20,12 +20,16 @@ export default async function DashboardLayout({
             <aside className="fixed left-0 top-0 h-full w-64 bg-white border-r border-gray-200 p-6 z-50">
                 {/* Logo */}
                 <div className="flex items-center gap-3 mb-10">
-                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 via-blue-600 to-cyan-400 flex items-center justify-center shadow-lg shadow-blue-500/20">
-                        <span className="text-white font-bold text-lg">S</span>
-                    </div>
+                    <img
+                        src="/logo-icon.png"
+                        alt="SekürAI"
+                        className="w-10 h-10 object-contain"
+                    />
                     <div>
-                        <span className="text-xl font-bold tracking-tight text-gray-900">SekurAI</span>
-                        <span className="block text-[10px] text-gray-500 uppercase tracking-wider">Security Platform</span>
+                        <span className="text-xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-cyan-500 tracking-tight">
+                            SekürAI
+                        </span>
+                        <span className="block text-[10px] text-gray-500 uppercase tracking-wider font-semibold">Security Platform</span>
                     </div>
                 </div>
 

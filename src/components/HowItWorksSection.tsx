@@ -2,26 +2,26 @@
 
 export default function HowItWorksSection() {
     return (
-        <section className="py-20 px6">
+        <section className="px-6 relative z-10">
             <div className="max-w-6xl mx-auto">
                 <div className="text-center mb-16">
-                    <h2 className="text-4xl font-bold text-gray-900 mb-4">How It Works</h2>
-                    <p className="text-xl text-gray-600">
+                    <h2 className="text-4xl font-bold text-white mb-4 tracking-tight">How It Works</h2>
+                    <p className="text-xl text-gray-400">
                         Three simple steps to find vulnerabilities before attackers do
                     </p>
                 </div>
 
                 <div className="grid md:grid-cols-3 gap-8 relative">
                     {/* Connectors for desktop */}
-                    <div className="hidden md:block absolute top-20 left-1/3 right-1/3 h-0.5 bg-gradient-to-r from-purple-300 via-cyan-300 to-purple-300"></div>
+                    <div className="hidden md:block absolute top-20 left-1/3 right-1/3 h-0.5 bg-gradient-to-r from-purple-500/20 via-cyan-500/20 to-purple-500/20"></div>
 
                     {/* Step 1 */}
-                    <div className="relative">
-                        <div className="bg-white rounded-xl p-8 border-2 border-purple-200 hover:border-purple-400 transition-colors shadow-sm">
-                            <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center text-white font-bold text-2xl shadow-lg">
+                    <div className="relative group">
+                        <div className="bg-white/5 rounded-2xl p-8 border border-white/5 backdrop-blur-sm hover:bg-white/10 transition-all duration-300 hover:-translate-y-1">
+                            <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-gradient-to-br from-purple-900/50 to-purple-600/20 flex items-center justify-center text-white font-bold text-2xl shadow-lg border border-purple-500/20 group-hover:scale-110 transition-transform">
                                 1
                             </div>
-                            <div className="w-12 h-12 mx-auto mb-4 text-purple-600">
+                            <div className="w-12 h-12 mx-auto mb-4 text-purple-400">
                                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path
                                         strokeLinecap="round"
@@ -31,10 +31,10 @@ export default function HowItWorksSection() {
                                     />
                                 </svg>
                             </div>
-                            <h3 className="text-xl font-bold text-gray-900 mb-2 text-center">
+                            <h3 className="text-xl font-bold text-white mb-2 text-center">
                                 Enter Your URL
                             </h3>
-                            <p className="text-gray-600 text-center">
+                            <p className="text-gray-400 text-center text-sm leading-relaxed">
                                 Paste your web application's URL. We'll validate it's reachable
                                 before starting.
                             </p>
@@ -42,12 +42,12 @@ export default function HowItWorksSection() {
                     </div>
 
                     {/* Step 2 */}
-                    <div className="relative">
-                        <div className="bg-white rounded-xl p-8 border-2 border-cyan-200 hover:border-cyan-400 transition-colors shadow-sm">
-                            <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-white font-bold text-2xl shadow-lg">
+                    <div className="relative group">
+                        <div className="bg-white/5 rounded-2xl p-8 border border-white/5 backdrop-blur-sm hover:bg-white/10 transition-all duration-300 hover:-translate-y-1">
+                            <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-gradient-to-br from-cyan-900/50 to-cyan-600/20 flex items-center justify-center text-white font-bold text-2xl shadow-lg border border-cyan-500/20 group-hover:scale-110 transition-transform">
                                 2
                             </div>
-                            <div className="w-12 h-12 mx-auto mb-4 text-cyan-600">
+                            <div className="w-12 h-12 mx-auto mb-4 text-cyan-400">
                                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path
                                         strokeLinecap="round"
@@ -57,10 +57,10 @@ export default function HowItWorksSection() {
                                     />
                                 </svg>
                             </div>
-                            <h3 className="text-xl font-bold text-gray-900 mb-2 text-center">
+                            <h3 className="text-xl font-bold text-white mb-2 text-center">
                                 AI Agents Attack
                             </h3>
-                            <p className="text-gray-600 text-center">
+                            <p className="text-gray-400 text-center text-sm leading-relaxed">
                                 Watch as XSS, SQL, IDOR, SSRF agents test your app—all in
                                 parallel, in real-time.
                             </p>
@@ -68,12 +68,12 @@ export default function HowItWorksSection() {
                     </div>
 
                     {/* Step 3 */}
-                    <div className="relative">
-                        <div className="bg-white rounded-xl p-8 border-2 border-purple-200 hover:border-purple-400 transition-colors shadow-sm">
-                            <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-2xl shadow-lg">
+                    <div className="relative group">
+                        <div className="bg-white/5 rounded-2xl p-8 border border-white/5 backdrop-blur-sm hover:bg-white/10 transition-all duration-300 hover:-translate-y-1">
+                            <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-gradient-to-br from-blue-900/50 to-purple-600/20 flex items-center justify-center text-white font-bold text-2xl shadow-lg border border-purple-500/20 group-hover:scale-110 transition-transform">
                                 3
                             </div>
-                            <div className="w-12 h-12 mx-auto mb-4 text-purple-600">
+                            <div className="w-12 h-12 mx-auto mb-4 text-purple-400">
                                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path
                                         strokeLinecap="round"
@@ -83,10 +83,10 @@ export default function HowItWorksSection() {
                                     />
                                 </svg>
                             </div>
-                            <h3 className="text-xl font-bold text-gray-900 mb-2 text-center">
+                            <h3 className="text-xl font-bold text-white mb-2 text-center">
                                 Get Your Report
                             </h3>
-                            <p className="text-gray-600 text-center">
+                            <p className="text-gray-400 text-center text-sm leading-relaxed">
                                 Receive detailed findings with proof-of-concept payloads and
                                 remediation guidance.
                             </p>
