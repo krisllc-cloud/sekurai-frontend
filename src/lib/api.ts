@@ -70,26 +70,63 @@ export const llmAPI = {
 };
 
 // Types
+export interface MissionConfig {
+    enable_ai_reasoning?: boolean;
+    enable_vision?: boolean;
+    aggressive_mode?: boolean;
+    include_subdomains?: boolean;
+    mission_type?: string;
+    [key: string]: unknown;
+}
+
 export interface Mission {
     id: string;
     target_url: string;
     status: string;
     phase: string;
-    config: Record<string, unknown>;
+    config: MissionConfig;
     created_at: string;
     updated_at: string;
+    endpoints_discovered?: number;
+    findings_count?: number;
     data?: {
         endpoints?: Array<{
             url: string;
             method: string;
             params?: string[];
             forms?: any[];
-            business_purpose?: string;      // NEW
-            sensitivity?: 'LOW' | 'HIGH';  // NEW
+            business_purpose?: string;
+            sensitivity?: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
+            risk_tier?: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
         }>;
         technologies?: string[];
-        business_context?: string;  // NEW
-        data_types?: string[];     // NEW
+        business_context?: string;
+        data_types?: string[];
+        // AI Analysis results
+        analysis?: {
+            total_endpoints: number;
+            risk_breakdown: {
+                critical: number;
+                high: number;
+                medium: number;
+                low: number;
+            };
+            attack_queue_size: number;
+            top_attack_types?: string[];
+            duration_seconds?: number;
+            cost_usd?: number;
+        };
+        attack_queue?: Array<{
+            attack_type: string;
+            target_endpoint: string;
+            target_method: string;
+            confidence: number;
+            owasp_category: string;
+            rationale: string;
+            payloads_to_try?: string[];
+            exploitation_steps?: string[];
+            priority_score: number;
+        }>;
         [key: string]: any;
     };
 }

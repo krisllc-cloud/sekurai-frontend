@@ -46,40 +46,65 @@ export function useMissions() {
 }
 
 /**
- * Hook to fetch a single mission
+ * Hook to fetch a single mission with auto-refresh for active missions
+ * Polls every 5 seconds when mission is in DISCOVERY or EXPLOITATION status
  */
 export function useMission(id: string) {
     const { getToken } = useAuth();
     const [mission, setMission] = useState<Mission | null>(null);
     const [loading, setLoading] = useState(true);
+    const [isRefreshing, setIsRefreshing] = useState(false);
+    const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
     const [error, setError] = useState<string | null>(null);
 
-    useEffect(() => {
-        async function fetchMission() {
-            try {
-                setLoading(true);
-                const token = await getToken();
-                if (!token) {
-                    throw new Error("Not authenticated");
-                }
+    const fetchMission = async (showLoading = false) => {
+        try {
+            if (showLoading) setLoading(true);
+            else setIsRefreshing(true);
 
-                const data = await missionsAPI.get(id, token);
-                setMission(data.mission);
-                setError(null);
-            } catch (err) {
-                setError(err instanceof Error ? err.message : "Failed to fetch mission");
-                setMission(null);
-            } finally {
-                setLoading(false);
+            const token = await getToken();
+            if (!token) {
+                throw new Error("Not authenticated");
             }
-        }
 
+            const data = await missionsAPI.get(id, token);
+            setMission(data.mission);
+            setLastUpdated(new Date());
+            setError(null);
+        } catch (err) {
+            setError(err instanceof Error ? err.message : "Failed to fetch mission");
+            setMission(null);
+        } finally {
+            if (showLoading) setLoading(false);
+            setIsRefreshing(false);
+        }
+    };
+
+    // Initial fetch
+    useEffect(() => {
         if (id) {
-            fetchMission();
+            fetchMission(true);
         }
     }, [id, getToken]);
 
-    return { mission, loading, error };
+    // Auto-refresh for active missions (every 5 seconds)
+    useEffect(() => {
+        if (!mission) return;
+
+        const isActive = ['DISCOVERY', 'EXPLOITATION', 'PENDING', 'RUNNING'].includes(mission.status);
+        if (!isActive) return;
+
+        const intervalId = setInterval(() => {
+            fetchMission(false); // Don't show loading spinner on refresh
+        }, 5000);
+
+        return () => clearInterval(intervalId);
+    }, [mission?.status, id, getToken]);
+
+    // Manual refresh function
+    const refresh = () => fetchMission(false);
+
+    return { mission, loading, error, refresh, isRefreshing, lastUpdated };
 }
 
 /**
