@@ -46,7 +46,7 @@ export default function StatsGrid() {
             { key: "total_missions" as keyof PlatformStats, target: stats.total_missions },
             { key: "total_endpoints" as keyof PlatformStats, target: stats.total_endpoints },
             { key: "total_payloads" as keyof PlatformStats, target: stats.total_payloads },
-            { key: "total_vulnerabilities" as keyof Platform Stats, target: stats.total_vulnerabilities },
+            { key: "total_vulnerabilities" as keyof PlatformStats, target: stats.total_vulnerabilities },
         ];
 
         let currentStep = 0;
