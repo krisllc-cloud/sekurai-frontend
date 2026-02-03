@@ -39,25 +39,26 @@ export default function AboutPage() {
                         </h1>
 
                         <div className="flex flex-col md:flex-row gap-16 items-start">
-                            {/* Founder Portrait substitute */}
-                            <div className="shrink-0 w-full md:w-[320px] aspect-[4/5] bg-gradient-to-br from-white/5 to-white/0 rounded-3xl border border-white/10 relative overflow-hidden flex items-center justify-center group">
+                            {/* Founder Portrait */}
+                            <div className="shrink-0 w-full md:w-[320px] aspect-[4/5] bg-gradient-to-br from-white/5 to-white/0 rounded-3xl border border-white/10 relative overflow-hidden group">
                                 <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-cyan-500/10 transition-opacity group-hover:opacity-75" />
-                                <div className="w-40 h-40 rounded-full bg-gradient-to-br from-purple-500 to-cyan-500 opacity-60 flex items-center justify-center mb-8">
-                                    <svg className="w-20 h-20 text-white/90" fill="currentColor" viewBox="0 0 24 24">
-                                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
-                                    </svg>
-                                </div>
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <img
+                                    src="https://media.licdn.com/dms/image/v2/C5603AQFEc7wOU7Q0iQ/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1517009020124?e=1771459200&v=beta&t=tQ7ygcNBRz_Q1XxyqpgF7YHYkd03gDyxTRTn5Z687Nw"
+                                    alt="Rajesh Ivaturi - Founder"
+                                    className="w-full h-full object-cover"
+                                />
                             </div>
 
                             <div className="flex-1 pt-4">
                                 <h2 className="text-4xl font-bold bg-gradient-to-br from-white to-white/60 bg-clip-text text-transparent mb-2">
-                                    Kris
+                                    Rajesh Ivaturi
                                 </h2>
                                 <p className="text-purple-400 font-medium text-lg mb-8">Founder & Chief Security Architect</p>
 
                                 <div className="prose prose-invert prose-lg text-gray-400 leading-relaxed font-light">
                                     <p className="mb-6">
-                                        After a decade of high-stakes ethical hacking engagements—from Fortune 500 banks to critical healthcare infrastructure—I witnessed a troubling pattern: million-dollar security budgets producing checkbox reports full of theoretical findings that never got fixed.
+                                        After a decade of high-stakes Layer 7 penetration testing engagements at Fortune 500 banks to critical healthcare infrastructure—I witnessed a troubling pattern: million-dollar security budgets producing checkbox reports full of theoretical findings that never got fixed.
                                     </p>
                                     <p>
                                         SekurAI was born from frustration with that system. I built what I wished existed: an autonomous offensive intelligence engine that thinks like a veteran pentester but executes at machine speed. Real exploitation. Real proof. Real results.
