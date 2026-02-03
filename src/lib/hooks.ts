@@ -154,7 +154,23 @@ export function useMissionUpdates(missionId: string) {
     useEffect(() => {
         if (!missionId) return;
 
-        const wsUrl = process.env.NEXT_PUBLIC_WS_URL || "ws://localhost:8000";
+        // Derive WebSocket URL from API URL
+        // Convert http://api.example.com to wss://api.example.com (or ws:// for localhost)
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+        if (!apiUrl) {
+            console.error("NEXT_PUBLIC_API_URL environment variable is not set");
+            return;
+        }
+
+        let wsUrl: string;
+        if (apiUrl.startsWith("https://")) {
+            wsUrl = apiUrl.replace("https://", "wss://");
+        } else if (apiUrl.startsWith("http://")) {
+            wsUrl = apiUrl.replace("http://", "ws://");
+        } else {
+            wsUrl = `wss://${apiUrl}`;
+        }
+
         const ws = new WebSocket(`${wsUrl}/ws/missions/${missionId}`);
 
         ws.onopen = () => {

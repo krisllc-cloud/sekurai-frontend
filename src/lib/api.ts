@@ -4,7 +4,10 @@
  * Connects to the FastAPI gateway using the Clerk JWT for authentication.
  */
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
+if (!API_URL) {
+    throw new Error("NEXT_PUBLIC_API_URL environment variable is not set");
+}
 
 interface FetchOptions extends RequestInit {
     token?: string;
