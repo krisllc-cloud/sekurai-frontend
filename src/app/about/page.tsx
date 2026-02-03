@@ -44,7 +44,7 @@ export default function AboutPage() {
                                 <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-cyan-500/10 transition-opacity group-hover:opacity-75" />
                                 {/* eslint-disable-next-line @next/next/no-img-element */}
                                 <img
-                                    src="https://media.licdn.com/dms/image/v2/C5603AQFEc7wOU7Q0iQ/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1517009020124?e=1771459200&v=beta&t=tQ7ygcNBRz_Q1XxyqpgF7YHYkd03gDyxTRTn5Z687Nw"
+                                    src="/founder.jpg"
                                     alt="Rajesh Ivaturi - Founder"
                                     className="w-full h-full object-cover"
                                 />
