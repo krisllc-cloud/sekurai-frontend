@@ -2,7 +2,7 @@
 
 import { useMission, useMissionUpdates, useDashboardStream } from "@/lib/hooks";
 import Link from "next/link";
-import { use, useEffect } from "react";
+import { use, useEffect, useState } from "react";
 import { MissionProgress } from "@/components/MissionProgress";
 import { EndpointRow } from "@/components/EndpointRow";
 import { GroupedEndpointList } from "@/components/GroupedEndpointList";
@@ -18,6 +18,11 @@ export default function MissionDetailPage({ params }: { params: Promise<{ id: st
     const { mission, loading, error, refresh, isRefreshing, lastUpdated } = useMission(id);
     const { connected, messages } = useMissionUpdates(id);
     const { connected: dashConnected, events } = useDashboardStream(id);
+
+    // Filter state for attack hypotheses
+    const [attackTypeFilter, setAttackTypeFilter] = useState<string>('all');
+    const [confidenceFilter, setConfidenceFilter] = useState<string>('all');
+    const [owaspFilter, setOwaspFilter] = useState<string>('all');
 
     // Auto-refresh when mission is in active phases
     useEffect(() => {
@@ -172,6 +177,7 @@ export default function MissionDetailPage({ params }: { params: Promise<{ id: st
                     <LiveFindings
                         confirmedVulns={mission.data?.confirmed_vulns || []}
                         hypotheses={mission.data?.attack_queue || []}
+                        missionStatus={mission.status}
                     />
                 </div>
 
@@ -274,46 +280,117 @@ export default function MissionDetailPage({ params }: { params: Promise<{ id: st
                     {/* Top Attack Hypotheses */}
                     {mission.data?.attack_queue && mission.data.attack_queue.length > 0 && (
                         <div>
-                            <h3 className="text-sm font-medium text-gray-600 mb-3">Top Attack Hypotheses</h3>
-                            <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2">
-                                {mission.data.attack_queue.slice(0, 5).map((attack, i) => (
-                                    <div key={i} className="bg-gray-50 rounded-lg p-4 border border-gray-200 hover:border-gray-300 transition">
-                                        <div className="flex items-start justify-between mb-2">
-                                            <div className="flex items-center gap-3">
-                                                <span className={`px-2 py-1 rounded text-xs font-medium ${attack.owasp_category.startsWith('A01') ? 'bg-red-100 text-red-700' :
-                                                    attack.owasp_category.startsWith('A03') ? 'bg-orange-100 text-orange-700' :
-                                                        attack.owasp_category.startsWith('A07') ? 'bg-yellow-100 text-yellow-700' :
-                                                            'bg-purple-100 text-purple-700'
-                                                    }`}>
-                                                    {attack.attack_type.replace(/_/g, ' ')}
-                                                </span>
-                                                <span className="text-xs text-gray-500">{attack.owasp_category}</span>
-                                            </div>
-                                            <div className="flex items-center gap-1 text-xs">
-                                                <span className="text-gray-500">Confidence:</span>
-                                                <span className={`font-medium ${attack.confidence >= 0.8 ? 'text-green-600' :
-                                                    attack.confidence >= 0.6 ? 'text-yellow-600' :
-                                                        'text-gray-600'
-                                                    }`}>{Math.round(attack.confidence * 100)}%</span>
-                                            </div>
-                                        </div>
-                                        <div className="text-sm text-gray-700 mb-2">
-                                            <span className="text-blue-600 font-mono text-xs">{attack.target_method}</span>{' '}
-                                            <span className="font-mono text-xs">{attack.target_endpoint}</span>
-                                        </div>
-                                        <p className="text-sm text-gray-600">{attack.rationale}</p>
+                            <div className="flex items-center justify-between mb-4">
+                                <h3 className="text-sm font-medium text-gray-600">Attack Hypotheses ({
+                                    mission.data.attack_queue.filter((attack: any) => {
+                                        const typeMatch = attackTypeFilter === 'all' || attack.attack_type === attackTypeFilter;
+                                        const confMatch = confidenceFilter === 'all' ||
+                                            (confidenceFilter === 'high' && attack.confidence >= 0.8) ||
+                                            (confidenceFilter === 'medium' && attack.confidence >= 0.6 && attack.confidence < 0.8) ||
+                                            (confidenceFilter === 'low' && attack.confidence < 0.6);
+                                        const owaspMatch = owaspFilter === 'all' || attack.owasp_category.startsWith(owaspFilter);
+                                        return typeMatch && confMatch && owaspMatch;
+                                    }).length
+                                })</h3>
 
-                                        {attack.payloads_to_try && attack.payloads_to_try.length > 0 && (
-                                            <div className="mt-2 flex flex-wrap gap-1">
-                                                {attack.payloads_to_try.slice(0, 3).map((payload, j) => (
-                                                    <span key={j} className="text-xs font-mono bg-gray-800 text-green-400 px-2 py-0.5 rounded">
-                                                        {payload.length > 30 ? payload.substring(0, 30) + '...' : payload}
+                                {/* Filter Controls */}
+                                <div className="flex items-center gap-2">
+                                    <select
+                                        value={attackTypeFilter}
+                                        onChange={(e) => setAttackTypeFilter(e.target.value)}
+                                        className="text-xs px-2 py-1 border border-gray-300 rounded bg-white text-gray-700"
+                                    >
+                                        <option value="all">All Types</option>
+                                        {Array.from(new Set(mission.data.attack_queue.map((a: any) => a.attack_type))).map((type: any) => (
+                                            <option key={type} value={type}>{type.replace(/_/g, ' ')}</option>
+                                        ))}
+                                    </select>
+
+                                    <select
+                                        value={confidenceFilter}
+                                        onChange={(e) => setConfidenceFilter(e.target.value)}
+                                        className="text-xs px-2 py-1 border border-gray-300 rounded bg-white text-gray-700"
+                                    >
+                                        <option value="all">All Confidence</option>
+                                        <option value="high">High (≥80%)</option>
+                                        <option value="medium">Medium (60-80%)</option>
+                                        <option value="low">Low (&lt;60%)</option>
+                                    </select>
+
+                                    <select
+                                        value={owaspFilter}
+                                        onChange={(e) => setOwaspFilter(e.target.value)}
+                                        className="text-xs px-2 py-1 border border-gray-300 rounded bg-white text-gray-700"
+                                    >
+                                        <option value="all">All OWASP</option>
+                                        {Array.from(new Set(mission.data.attack_queue.map((a: any) => a.owasp_category.split(':')[0]))).map((cat: any) => (
+                                            <option key={cat} value={cat}>{cat}</option>
+                                        ))}
+                                    </select>
+
+                                    {(attackTypeFilter !== 'all' || confidenceFilter !== 'all' || owaspFilter !== 'all') && (
+                                        <button
+                                            onClick={() => {
+                                                setAttackTypeFilter('all');
+                                                setConfidenceFilter('all');
+                                                setOwaspFilter('all');
+                                            }}
+                                            className="text-xs px-2 py-1 text-blue-600 hover:text-blue-700"
+                                        >
+                                            Clear
+                                        </button>
+                                    )}
+                                </div>
+                            </div>
+                            <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2">
+                                {mission.data.attack_queue
+                                    .filter((attack: any) => {
+                                        const typeMatch = attackTypeFilter === 'all' || attack.attack_type === attackTypeFilter;
+                                        const confMatch = confidenceFilter === 'all' ||
+                                            (confidenceFilter === 'high' && attack.confidence >= 0.8) ||
+                                            (confidenceFilter === 'medium' && attack.confidence >= 0.6 && attack.confidence < 0.8) ||
+                                            (confidenceFilter === 'low' && attack.confidence < 0.6);
+                                        const owaspMatch = owaspFilter === 'all' || attack.owasp_category.startsWith(owaspFilter);
+                                        return typeMatch && confMatch && owaspMatch;
+                                    })
+                                    .map((attack, i) => (
+                                        <div key={i} className="bg-gray-50 rounded-lg p-4 border border-gray-200 hover:border-gray-300 transition">
+                                            <div className="flex items-start justify-between mb-2">
+                                                <div className="flex items-center gap-3">
+                                                    <span className={`px-2 py-1 rounded text-xs font-medium ${attack.owasp_category.startsWith('A01') ? 'bg-red-100 text-red-700' :
+                                                        attack.owasp_category.startsWith('A03') ? 'bg-orange-100 text-orange-700' :
+                                                            attack.owasp_category.startsWith('A07') ? 'bg-yellow-100 text-yellow-700' :
+                                                                'bg-purple-100 text-purple-700'
+                                                        }`}>
+                                                        {attack.attack_type.replace(/_/g, ' ')}
                                                     </span>
-                                                ))}
+                                                    <span className="text-xs text-gray-500">{attack.owasp_category}</span>
+                                                </div>
+                                                <div className="flex items-center gap-1 text-xs">
+                                                    <span className="text-gray-500">Confidence:</span>
+                                                    <span className={`font-medium ${attack.confidence >= 0.8 ? 'text-green-600' :
+                                                        attack.confidence >= 0.6 ? 'text-yellow-600' :
+                                                            'text-gray-600'
+                                                        }`}>{Math.round(attack.confidence * 100)}%</span>
+                                                </div>
                                             </div>
-                                        )}
-                                    </div>
-                                ))}
+                                            <div className="text-sm text-gray-700 mb-2">
+                                                <span className="text-blue-600 font-mono text-xs">{attack.target_method}</span>{' '}
+                                                <span className="font-mono text-xs">{attack.target_endpoint}</span>
+                                            </div>
+                                            <p className="text-sm text-gray-600">{attack.rationale}</p>
+
+                                            {attack.payloads_to_try && attack.payloads_to_try.length > 0 && (
+                                                <div className="mt-2 flex flex-wrap gap-1">
+                                                    {attack.payloads_to_try.slice(0, 3).map((payload, j) => (
+                                                        <span key={j} className="text-xs font-mono bg-gray-800 text-green-400 px-2 py-0.5 rounded">
+                                                            {payload.length > 30 ? payload.substring(0, 30) + '...' : payload}
+                                                        </span>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </div>
+                                    ))}
                             </div>
                         </div>
                     )}

@@ -13,6 +13,7 @@
 interface LiveFindingsProps {
     confirmedVulns: any[];
     hypotheses?: any[]; // Not displayed, just for loading state
+    missionStatus?: string; // Mission completion status
 }
 
 // Severity badge colors
@@ -36,8 +37,10 @@ const detectionDisplayNames: Record<string, string> = {
     "rce": "Remote Code Execution",
 };
 
-export function LiveFindings({ confirmedVulns = [], hypotheses = [] }: LiveFindingsProps) {
-    const isScanning = hypotheses.length > 0 && confirmedVulns.length === 0;
+export function LiveFindings({ confirmedVulns = [], hypotheses = [], missionStatus }: LiveFindingsProps) {
+    // Only show scanning state if mission is actively working (not in terminal state)
+    const isCompleted = missionStatus === 'COMPLETED' || missionStatus === 'FAILED';
+    const isScanning = !isCompleted && hypotheses.length > 0 && confirmedVulns.length === 0;
 
     return (
         <div className="h-full flex flex-col">
@@ -95,8 +98,8 @@ export function LiveFindings({ confirmedVulns = [], hypotheses = [] }: LiveFindi
                                     {/* Target */}
                                     <div className="flex items-center gap-2 mb-3 text-xs">
                                         <span className={`px-1.5 py-0.5 rounded font-mono font-medium ${vuln.method === 'POST' ? 'bg-green-100 text-green-700' :
-                                                vuln.method === 'GET' ? 'bg-blue-100 text-blue-700' :
-                                                    'bg-yellow-100 text-yellow-700'
+                                            vuln.method === 'GET' ? 'bg-blue-100 text-blue-700' :
+                                                'bg-yellow-100 text-yellow-700'
                                             }`}>
                                             {vuln.method || 'POST'}
                                         </span>
