@@ -4,10 +4,8 @@
  * Connects to the FastAPI gateway using the Clerk JWT for authentication.
  */
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
-if (!API_URL) {
-    throw new Error("NEXT_PUBLIC_API_URL environment variable is not set");
-}
+// Use empty string during build, check at runtime
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "";
 
 interface FetchOptions extends RequestInit {
     token?: string;
@@ -18,6 +16,10 @@ async function fetchAPI<T>(
     options: FetchOptions = {}
 ): Promise<T> {
     const { token, ...fetchOptions } = options;
+
+    if (!API_URL) {
+        throw new Error("NEXT_PUBLIC_API_URL environment variable is not set. Please configure it in your deployment settings.");
+    }
 
     const headers: HeadersInit = {
         "Content-Type": "application/json",
