@@ -1,6 +1,6 @@
 "use client";
 
-import { useMission, useMissionUpdates } from "@/lib/hooks";
+import { useMission, useMissionUpdates, useDashboardStream } from "@/lib/hooks";
 import Link from "next/link";
 import { use, useEffect } from "react";
 import { MissionProgress } from "@/components/MissionProgress";
@@ -8,14 +8,16 @@ import { EndpointRow } from "@/components/EndpointRow";
 import { GroupedEndpointList } from "@/components/GroupedEndpointList";
 import { LiveFindings } from "@/components/LiveFindings";
 import { AttackSurfaceTree } from "@/components/AttackSurfaceTree";
-import { AgentActivityStream } from "@/components/AgentActivityStream";
 import { MissionStatusHero } from "@/components/MissionStatusHero";
 import { FindingCard } from "@/components/FindingCard";
+import { NeuralActivityMap } from "@/components/dashboard/NeuralActivityMap";
+import { SecurityInsightFeed } from "@/components/dashboard/SecurityInsightFeed";
 
 export default function MissionDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = use(params);
     const { mission, loading, error, refresh, isRefreshing, lastUpdated } = useMission(id);
     const { connected, messages } = useMissionUpdates(id);
+    const { connected: dashConnected, events } = useDashboardStream(id);
 
     // Auto-refresh when mission is in active phases
     useEffect(() => {
@@ -153,7 +155,7 @@ export default function MissionDetailPage({ params }: { params: Promise<{ id: st
                 data={mission.data}
             />
 
-            {/* 3-Column Layout: Attack Surface | Live Findings | Agent Activity */}
+            {/* 3-Column Layout: Attack Surface | Live Findings | Neural Dashboard */}
             <div className="grid grid-cols-12 gap-4 h-[480px]">
                 {/* Attack Surface - Left Column */}
                 <div className="col-span-3 rounded-xl bg-white shadow-sm border border-gray-200 p-4 overflow-y-auto">
@@ -173,14 +175,23 @@ export default function MissionDetailPage({ params }: { params: Promise<{ id: st
                     />
                 </div>
 
-                {/* Agent Activity - Right Column */}
-                <div className="col-span-4 rounded-xl bg-white shadow-sm border border-gray-200 p-4 overflow-y-auto">
-                    <AgentActivityStream
-                        missionId={mission.id}
-                        status={mission.status}
-                        recentMessages={messages}
-                        mission={mission}
-                    />
+                {/* Neural Dashboard - Right Column (2-row layout) */}
+                <div className="col-span-4 flex flex-col gap-4">
+                    {/* Neural Activity Map */}
+                    <div className="h-[220px]">
+                        <NeuralActivityMap
+                            activeAgents={mission.data?.agents ? Object.keys(mission.data.agents).map(name => ({
+                                name,
+                                status: mission.data.agents[name]?.status || 'idle'
+                            })) : []}
+                            recentEvents={events}
+                        />
+                    </div>
+
+                    {/* Security Insight Feed */}
+                    <div className="flex-1">
+                        <SecurityInsightFeed events={events} />
+                    </div>
                 </div>
             </div>
 

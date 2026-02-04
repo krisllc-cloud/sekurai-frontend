@@ -207,3 +207,78 @@ export function useMissionUpdates(missionId: string) {
 
     return { connected, messages };
 }
+
+/**
+ * Hook for Real-time Dashboard Stream (Neural Activity & Insights)
+ * Connects to /ws/mission/{missionId}/dashboard
+ */
+export function useDashboardStream(missionId: string) {
+    const [connected, setConnected] = useState(false);
+    const [events, setEvents] = useState<any[]>([]);
+
+    useEffect(() => {
+        if (!missionId) return;
+
+        // Derive WebSocket URL
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:9000"; // Default to admin port if not set
+        let wsUrl: string;
+
+        // Handle conversion from http/https to ws/wss
+        if (apiUrl.startsWith("https://")) {
+            wsUrl = apiUrl.replace("https://", "wss://");
+        } else if (apiUrl.startsWith("http://")) {
+            wsUrl = apiUrl.replace("http://", "ws://");
+        } else {
+            // If just domain is provided
+            wsUrl = `ws://${apiUrl}`;
+        }
+
+        // Remove /api suffix if present to prevent double path
+        wsUrl = wsUrl.replace(/\/api$/, "");
+
+        const ws = new WebSocket(`${wsUrl}/ws/mission/${missionId}/dashboard`);
+
+        ws.onopen = () => {
+            setConnected(true);
+            console.log(`Connected to dashboard stream for ${missionId}`);
+        };
+
+        ws.onmessage = (event) => {
+            try {
+                const data = JSON.parse(event.data);
+                // Add to events list
+                setEvents(prev => [...prev, data].slice(-50)); // Keep last 50
+            } catch (e) {
+                console.error("Failed to parse dashboard event", e);
+            }
+        };
+
+        ws.onclose = () => {
+            setConnected(false);
+            // console.log(`Disconnected from dashboard stream ${missionId}`);
+        };
+
+        ws.onerror = (error) => {
+            console.error("Dashboard WebSocket error:", error);
+        };
+
+        // Ping intervals
+        const pingInterval = setInterval(() => {
+            if (ws.readyState === WebSocket.OPEN) {
+                ws.send("ping");
+            }
+        }, 30000);
+
+        return () => {
+            clearInterval(pingInterval);
+            ws.close();
+        };
+    }, [missionId]);
+
+    // Function to set initial history (e.g. from REST API)
+    const setHistory = (history: any[]) => {
+        setEvents(history);
+    };
+
+    return { connected, events, setHistory };
+}

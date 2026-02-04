@@ -52,6 +52,17 @@ export const missionsAPI = {
             body: JSON.stringify(data),
             token,
         }),
+
+    getDashboard: (id: string, token: string) =>
+        fetchAPI<{
+            mission_id: string;
+            target: string;
+            status: string;
+            created_at: string;
+            active_agents: Array<{ name: string; status: string; progress: number }>;
+            recent_events: any[];
+            stats: { endpoints: number; findings: number; ai_decisions: number };
+        }>(`/api/mission/${id}/dashboard`, { token }),
 };
 
 // Memory API
