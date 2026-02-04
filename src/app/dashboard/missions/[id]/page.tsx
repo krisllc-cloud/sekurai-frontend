@@ -182,7 +182,7 @@ export default function MissionDetailPage({ params }: { params: Promise<{ id: st
                         <NeuralActivityMap
                             activeAgents={mission.data?.agents ? Object.keys(mission.data.agents).map(name => ({
                                 name,
-                                status: mission.data.agents[name]?.status || 'idle'
+                                status: mission.data?.agents?.[name]?.status || 'idle'
                             })) : []}
                             recentEvents={events}
                         />
