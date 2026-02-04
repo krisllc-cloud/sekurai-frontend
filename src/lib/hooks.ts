@@ -220,7 +220,12 @@ export function useDashboardStream(missionId: string) {
         if (!missionId) return;
 
         // Derive WebSocket URL
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:9000"; // Default to admin port if not set
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+        if (!apiUrl) {
+            console.error("NEXT_PUBLIC_API_URL environment variable is not set - cannot connect to dashboard stream");
+            return;
+        }
+
         let wsUrl: string;
 
         // Handle conversion from http/https to ws/wss
