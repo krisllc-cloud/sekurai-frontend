@@ -241,7 +241,7 @@ export function useDashboardStream(missionId: string) {
         // Remove /api suffix if present to prevent double path
         wsUrl = wsUrl.replace(/\/api$/, "");
 
-        const ws = new WebSocket(`${wsUrl}/ws/mission/${missionId}/dashboard`);
+        const ws = new WebSocket(`${wsUrl}/ws/missions/${missionId}`);
 
         ws.onopen = () => {
             setConnected(true);

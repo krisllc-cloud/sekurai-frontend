@@ -10,8 +10,8 @@ import { LiveFindings } from "@/components/LiveFindings";
 import { AttackSurfaceTree } from "@/components/AttackSurfaceTree";
 import { MissionStatusHero } from "@/components/MissionStatusHero";
 import { FindingCard } from "@/components/FindingCard";
-import { NeuralActivityMap } from "@/components/dashboard/NeuralActivityMap";
 import { SecurityInsightFeed } from "@/components/dashboard/SecurityInsightFeed";
+import { SecurityReport } from "@/components/SecurityReport";
 
 export default function MissionDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = use(params);
@@ -23,6 +23,14 @@ export default function MissionDetailPage({ params }: { params: Promise<{ id: st
     const [attackTypeFilter, setAttackTypeFilter] = useState<string>('all');
     const [confidenceFilter, setConfidenceFilter] = useState<string>('all');
     const [owaspFilter, setOwaspFilter] = useState<string>('all');
+
+    // View tab state (Details vs Report)
+    const [activeView, setActiveView] = useState<'details' | 'report'>('details');
+
+    // Findings filter state
+    const [findingsSeverityFilter, setFindingsSeverityFilter] = useState<string>('all');
+    const [findingsTypeFilter, setFindingsTypeFilter] = useState<string>('all');
+    const [findingsSearchQuery, setFindingsSearchQuery] = useState<string>('');
 
     // Auto-refresh when mission is in active phases
     useEffect(() => {
@@ -181,21 +189,9 @@ export default function MissionDetailPage({ params }: { params: Promise<{ id: st
                     />
                 </div>
 
-                {/* Neural Dashboard - Right Column (2-row layout) */}
-                <div className="col-span-4 flex flex-col gap-4">
-                    {/* Neural Activity Map */}
-                    <div className="h-[220px]">
-                        <NeuralActivityMap
-                            activeAgents={mission.data?.agents ? Object.keys(mission.data.agents).map(name => ({
-                                name,
-                                status: mission.data?.agents?.[name]?.status || 'idle'
-                            })) : []}
-                            recentEvents={events}
-                        />
-                    </div>
-
-                    {/* Security Insight Feed */}
-                    <div className="flex-1">
+                {/* Intelligence Feed - Full Width */}
+                <div className="col-span-4">
+                    <div className="h-[500px]"> {/* Fixed height container */}
                         <SecurityInsightFeed events={events} />
                     </div>
                 </div>
@@ -397,78 +393,141 @@ export default function MissionDetailPage({ params }: { params: Promise<{ id: st
                 </div>
             )}
 
-            {/* Mission Status Hero - NEW */}
-            {mission.status === 'COMPLETED' && mission.data?.confirmed_vulns && (
-                <MissionStatusHero
-                    status={mission.status}
-                    targetUrl={mission.target_url}
-                    duration={mission.data.analysis?.duration_seconds}
-                    severityCounts={{
-                        critical: mission.data.confirmed_vulns.filter((v: any) =>
-                            v.severity === 'CRITICAL' || !v.severity
-                        ).length,
-                        high: mission.data.confirmed_vulns.filter((v: any) =>
-                            v.severity === 'HIGH'
-                        ).length,
-                        medium: mission.data.confirmed_vulns.filter((v: any) =>
-                            v.severity === 'MEDIUM'
-                        ).length,
-                        low: mission.data.confirmed_vulns.filter((v: any) =>
-                            v.severity === 'LOW'
-                        ).length,
-                    }}
-                    onExport={() => {
-                        // TODO: Implement export functionality
-                        alert('Export functionality coming soon!');
-                    }}
-                    onShare={() => {
-                        // TODO: Implement share functionality
-                        alert('Share functionality coming soon!');
-                    }}
-                />
-            )}
 
-            {/* 🎯 Confirmed Vulnerabilities - Redesigned with Finding Cards */}
+            {/* 🎯 Confirmed Findings - All Successfully Validated Vulnerabilities */}
             {mission.data?.confirmed_vulns && mission.data.confirmed_vulns.length > 0 && (
                 <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+                    {/* Header with Tabs */}
                     <div className="flex items-center justify-between mb-6">
                         <h2 className="text-xl font-semibold text-gray-900 flex items-center gap-2">
                             <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                             </svg>
-                            Critical Vulnerabilities ({mission.data.confirmed_vulns.length})
+                            Confirmed Findings ({mission.data.confirmed_vulns.length})
                         </h2>
-                        <button
-                            onClick={() => alert('Export all findings coming soon!')}
-                            className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors flex items-center gap-2 font-medium text-sm"
-                        >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                            </svg>
-                            Export All
-                        </button>
+
+                        {/* Tab Navigation */}
+                        <div className="flex items-center gap-2">
+                            <div className="flex border border-gray-300 rounded-lg overflow-hidden">
+                                <button
+                                    onClick={() => setActiveView('details')}
+                                    className={`px-4 py-2 text-sm font-medium transition-colors ${activeView === 'details'
+                                        ? 'bg-blue-600 text-white'
+                                        : 'bg-white text-gray-700 hover:bg-gray-50'
+                                        }`}
+                                >
+                                    Details
+                                </button>
+                                <button
+                                    onClick={() => setActiveView('report')}
+                                    className={`px-4 py-2 text-sm font-medium transition-colors ${activeView === 'report'
+                                        ? 'bg-blue-600 text-white'
+                                        : 'bg-white text-gray-700 hover:bg-gray-50'
+                                        }`}
+                                >
+                                    Report
+                                </button>
+                            </div>
+                        </div>
                     </div>
 
-                    <div className="space-y-4">
-                        {mission.data.confirmed_vulns.map((vuln: any, i: number) => (
-                            <FindingCard
-                                key={i}
-                                finding={{
-                                    detection_type: vuln.detection_type || 'SQL Injection',
-                                    target_url: vuln.target_url,
-                                    method: vuln.method || 'POST',
-                                    parameter: vuln.parameter,
-                                    payload: vuln.payload,
-                                    confidence: vuln.confidence ? Math.round(vuln.confidence * 100) : 95,
-                                    db_dialect: vuln.db_dialect,
-                                    reasoning: vuln.reasoning,
-                                    raw_request: vuln.raw_request,
-                                    response_snippet: vuln.response_snippet,
-                                    severity: vuln.severity || 'CRITICAL',
-                                }}
-                            />
-                        ))}
-                    </div>
+                    {/* Details View with Filters */}
+                    {activeView === 'details' ? (
+                        <>
+                            {/* Filters */}
+                            <div className="mb-4 flex items-center gap-3 flex-wrap pb-4 border-b border-gray-200">
+                                <select
+                                    value={findingsSeverityFilter}
+                                    onChange={(e) => setFindingsSeverityFilter(e.target.value)}
+                                    className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                >
+                                    <option value="all">All Severities</option>
+                                    <option value="CRITICAL">Critical</option>
+                                    <option value="HIGH">High</option>
+                                    <option value="MEDIUM">Medium</option>
+                                    <option value="LOW">Low</option>
+                                </select>
+
+                                <select
+                                    value={findingsTypeFilter}
+                                    onChange={(e) => setFindingsTypeFilter(e.target.value)}
+                                    className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                >
+                                    <option value="all">All Types</option>
+                                    <option value="SQL Injection">SQL Injection</option>
+                                    <option value="XSS">XSS</option>
+                                    <option value="IDOR">IDOR</option>
+                                    <option value="SSRF">SSRF</option>
+                                    <option value="CMDI">Command Injection</option>
+                                </select>
+
+                                <input
+                                    type="text"
+                                    placeholder="Search URL or parameter..."
+                                    value={findingsSearchQuery}
+                                    onChange={(e) => setFindingsSearchQuery(e.target.value)}
+                                    className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 min-w-[200px]"
+                                />
+
+                                {(() => {
+                                    const filtered = mission.data.confirmed_vulns
+                                        .filter((v: any) => findingsSeverityFilter === 'all' || v.severity === findingsSeverityFilter || (!v.severity && findingsSeverityFilter === 'CRITICAL'))
+                                        .filter((v: any) => findingsTypeFilter === 'all' || v.detection_type === findingsTypeFilter)
+                                        .filter((v: any) => !findingsSearchQuery || v.target_url.toLowerCase().includes(findingsSearchQuery.toLowerCase()) || v.parameter?.toLowerCase().includes(findingsSearchQuery.toLowerCase()));
+
+                                    return (
+                                        <span className="text-sm text-gray-500 ml-auto">
+                                            Showing {filtered.length} of {mission.data.confirmed_vulns.length}
+                                        </span>
+                                    );
+                                })()}
+                            </div>
+
+                            {/* Findings List */}
+                            <div className="space-y-4">
+                                {(() => {
+                                    const filteredFindings = mission.data.confirmed_vulns
+                                        .filter((v: any) => findingsSeverityFilter === 'all' || v.severity === findingsSeverityFilter || (!v.severity && findingsSeverityFilter === 'CRITICAL'))
+                                        .filter((v: any) => findingsTypeFilter === 'all' || v.detection_type === findingsTypeFilter)
+                                        .filter((v: any) => !findingsSearchQuery || v.target_url.toLowerCase().includes(findingsSearchQuery.toLowerCase()) || v.parameter?.toLowerCase().includes(findingsSearchQuery.toLowerCase()));
+
+                                    if (filteredFindings.length === 0) {
+                                        return (
+                                            <div className="text-center py-8 text-gray-500">
+                                                <svg className="w-12 h-12 mx-auto mb-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                                </svg>
+                                                <p>No findings match your filters</p>
+                                            </div>
+                                        );
+                                    }
+
+                                    return filteredFindings.map((vuln: any, i: number) => (
+                                        <FindingCard
+                                            key={i}
+                                            finding={{
+                                                detection_type: vuln.detection_type || 'SQL Injection',
+                                                target_url: vuln.target_url,
+                                                method: vuln.method || 'POST',
+                                                parameter: vuln.parameter,
+                                                payload: vuln.payload,
+                                                confidence: vuln.confidence ? Math.round(vuln.confidence * 100) : 95,
+                                                db_dialect: vuln.db_dialect,
+                                                reasoning: vuln.reasoning,
+                                                raw_request: vuln.raw_request,
+                                                response_snippet: vuln.response_snippet,
+                                                severity: vuln.severity || 'CRITICAL',
+                                                evidence_screenshot: vuln.evidence_screenshot,
+                                            }}
+                                        />
+                                    ));
+                                })()}
+                            </div>
+                        </>
+                    ) : (
+                        /* Report View */
+                        <SecurityReport mission={mission} />
+                    )}
                 </div>
             )}
 

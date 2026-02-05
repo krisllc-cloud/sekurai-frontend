@@ -116,7 +116,9 @@ export function LiveFindings({ confirmedVulns = [], hypotheses = [], missionStat
                                     {/* Payload */}
                                     <div className="bg-gray-900 rounded-lg p-2.5">
                                         <code className="text-green-400 text-xs font-mono block truncate">
-                                            {vuln.payload}
+                                            {typeof vuln.payload === 'object'
+                                                ? JSON.stringify(vuln.payload)
+                                                : vuln.payload}
                                         </code>
                                     </div>
                                 </div>

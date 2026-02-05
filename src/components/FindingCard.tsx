@@ -21,6 +21,7 @@ interface VulnerabilityFinding {
     raw_request?: string;
     response_snippet?: string;
     severity?: 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW';
+    evidence_screenshot?: string;
 }
 
 interface FindingCardProps {
@@ -29,7 +30,7 @@ interface FindingCardProps {
 
 export function FindingCard({ finding }: FindingCardProps) {
     const [isExpanded, setIsExpanded] = useState(false);
-    const [activeTab, setActiveTab] = useState<'poc' | 'request' | 'response' | 'analysis' | 'remediation'>('poc');
+    const [activeTab, setActiveTab] = useState<'poc' | 'request' | 'response' | 'analysis' | 'evidence' | 'remediation'>('poc');
     const [copySuccess, setCopySuccess] = useState(false);
 
     const severity = finding.severity || 'CRITICAL';
@@ -45,6 +46,7 @@ export function FindingCard({ finding }: FindingCardProps) {
         { id: 'request' as const, label: 'Raw Request' },
         { id: 'response' as const, label: 'Raw Response' },
         { id: 'analysis' as const, label: 'AI Analysis' },
+        { id: 'evidence' as const, label: 'Visual Evidence' },
         { id: 'remediation' as const, label: 'Remediation' },
     ];
 
@@ -58,7 +60,7 @@ export function FindingCard({ finding }: FindingCardProps) {
                             {severity}
                         </span>
                         <h3 className="text-lg font-semibold text-gray-900">
-                            {finding.detection_type.replace(/_/g, ' ')}
+                            {finding.detection_type.replace(/_/g, ' ')} <span className="text-xs text-gray-400 font-normal">(v2.1 Evidence)</span>
                         </h3>
                         {finding.db_dialect && (
                             <span className="text-xs text-purple-700 bg-purple-100 px-2 py-1 rounded">
@@ -130,8 +132,8 @@ export function FindingCard({ finding }: FindingCardProps) {
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id)}
                                 className={`px-4 py-3 text-sm font-medium transition-colors relative ${activeTab === tab.id
-                                        ? 'text-blue-600 border-b-2 border-blue-600 -mb-px'
-                                        : 'text-gray-600 hover:text-gray-900'
+                                    ? 'text-blue-600 border-b-2 border-blue-600 -mb-px'
+                                    : 'text-gray-600 hover:text-gray-900'
                                     }`}
                             >
                                 {tab.label}
@@ -193,7 +195,7 @@ ${finding.parameter}=${finding.payload}`}
                                 <pre className="bg-gray-900 p-4 rounded-lg text-gray-300 text-xs font-mono overflow-x-auto whitespace-pre-wrap">
                                     {finding.raw_request || `${finding.method || 'POST'} ${new URL(finding.target_url).pathname} HTTP/1.1
 Host: ${new URL(finding.target_url).hostname}
-User-Agent: SekurAI/2.0 (Agentic Security Scanner)
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36
 Accept: */*
 Content-Type: application/x-www-form-urlencoded
 Content-Length: ${finding.payload.length}
@@ -250,6 +252,41 @@ ${finding.parameter}=${finding.payload}`}
                                 </div>
                             </div>
                         )}
+
+                        {activeTab === 'evidence' && (
+                            <div>
+                                <h4 className="text-sm font-semibold text-gray-700 mb-4">Proof of Concept Evidence</h4>
+                                {finding.evidence_screenshot ? (
+                                    <div className="border border-gray-200 rounded-lg overflow-hidden bg-gray-50">
+                                        <div className="bg-gray-100 px-4 py-2 border-b border-gray-200 flex justify-between items-center">
+                                            <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Screenshot</span>
+                                            <span className="text-xs text-gray-400">Captured via Headless Browser</span>
+                                        </div>
+                                        <div className="p-4 bg-gray-900 flex justify-center">
+                                            <img
+                                                src={`data:image/png;base64,${finding.evidence_screenshot}`}
+                                                alt="Vulnerability Evidence"
+                                                className="max-w-full h-auto rounded shadow-lg border border-gray-700"
+                                            />
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 flex items-start gap-3">
+                                        <svg className="w-5 h-5 text-yellow-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                        </svg>
+                                        <div>
+                                            <h5 className="text-sm font-medium text-yellow-800">No Visual Evidence Captured</h5>
+                                            <p className="text-sm text-yellow-700 mt-1">
+                                                A screenshot was not captured for this finding. This may be because it's a low-severity issue or the capture timed out.
+                                            </p>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+
+
 
                         {activeTab === 'remediation' && (
                             <div>
